@@ -1,0 +1,404 @@
+{
+  "info": {
+    "_postman_id": "b7964086-add1-4659-821e-8f7d009b62f6",
+    "name": "DummyJSON API Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53481831",
+    "_collection_link": "https://go.postman.co/collection/42887751-b7964086-add1-4659-821e-8f7d009b62f6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "var res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "pm.environment.set(\"accessToken\", res.accessToken);\r",
+                  "pm.environment.set(\"validUserId\", res.id);\r",
+                  "\r",
+                  "pm.test(\"Login successful - id exists\", function () {\r",
+                  "    pm.expect(res.id).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Access token exists\", function () {\r",
+                  "    pm.expect(res.accessToken).to.exist;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/user/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();\r",
+                  "\r",
+                  "// Save dynamic ID (for demonstration)\r",
+                  "pm.environment.set(\"dynamicUserId\", res.id);\r",
+                  "\r",
+                  "// Save valid static ID (IMPORTANT FIX)\r",
+                  "pm.environment.set(\"validUserId\", 1);\r",
+                  "\r",
+                  "pm.test(\"User created\", function () {\r",
+                  "    pm.expect(res.id).to.exist;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Test\",\r\n  \"lastName\": \"User\",\r\n  \"email\": \"user_{{$timestamp}}@test.com\",\r\n  \"age\": {{$randomInt}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"User fetched correctly\", function () {\r",
+                  "    pm.expect(res.id).to.eql(1);\r",
+                  "});\r",
+                  "\r",
+                  "// Schema validation\r",
+                  "var schema = {\r",
+                  "    type: \"object\",\r",
+                  "    properties: {\r",
+                  "        id: { type: \"number\" },\r",
+                  "        firstName: { type: \"string\" },\r",
+                  "        lastName: { type: \"string\" },\r",
+                  "        age: { type: \"number\" }\r",
+                  "    },\r",
+                  "    required: [\"id\", \"firstName\", \"lastName\"]\r",
+                  "};\r",
+                  "\r",
+                  "pm.test(\"Schema valid\", function () {\r",
+                  "    pm.expect(tv4.validate(res, schema)).to.be.true;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"User updated\", function () {\r",
+                  "    pm.expect(res.lastName).to.include(\"Updated\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"lastName\": \"Updated_{{$timestamp}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"User deleted\", function () {\r",
+                  "    pm.expect(res.isDeleted).to.be.true;\r",
+                  "}); "
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Invalid User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Should return 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"invalidUserId\", 999999);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{invalidUserId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{invalidUserId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "\r",
+          "// STATUS CODE (allow success + negative test)\r",
+          "pm.test(\"Status code is valid\", function () {\r",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 404]);\r",
+          "});\r",
+          "\r",
+          "\r",
+          "pm.test(\"Response time < 1000ms\", function () {\r",
+          "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+          "});\r",
+          "\r",
+          "// Helper function\r",
+          "function getJson() {\r",
+          "    try {\r",
+          "        return pm.response.json();\r",
+          "    } catch (e) {\r",
+          "        return {};\r",
+          "    }\r",
+          "}"
+        ]
+      }
+    }
+  ]
+}
